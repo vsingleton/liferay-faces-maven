@@ -190,11 +190,13 @@ fi
 
 if [ "$REBUILD_SHOWCASE" = "true" ] ; then
 	if [ -z $EXTRA_PROFILE_NAMES ] ; then
-		pushd $LIFERAY_FACES_DIR/demos/showcase/showcase-common; mvn clean install; popd
-		pushd $LIFERAY_FACES_DIR/demos/showcase/showcase-webapp; mvn clean install; popd
+
+		for b in $( ls -d $LIFERAY_FACES_DIR/../liferay-faces-alloy* ); do pushd $b >>/dev/null && git status | grep -e Untracked -e Changes >>/dev/null; if [ "$?" = "0" ]; then echo Changes found ...; pwd; pushd demos/showcase/showcase-common >>/dev/null; mvn clean install; popd >>/dev/null; pushd demos/showcase/showcase-webapp >>/dev/null; mvn clean install; popd >>/dev/null; fi; popd >>/dev/null; done
+
 	else
-		pushd $LIFERAY_FACES_DIR/demos/showcase/showcase-common; mvn -P $EXTRA_PROFILE_NAMES clean install; popd
-		pushd $LIFERAY_FACES_DIR/demos/showcase/showcase-webapp; mvn -P $EXTRA_PROFILE_NAMES clean install; popd
+
+		for b in $( ls -d $LIFERAY_FACES_DIR/../liferay-faces-alloy* ); do pushd $b >>/dev/null && git status | grep -e Untracked -e Changes >>/dev/null; if [ "$?" = "0" ]; then echo Changes found ...; pwd; pushd demos/showcase/showcase-common >>/dev/null; mvn -P $EXTRA_PROFILE_NAMES clean install; popd >>/dev/null; pushd demos/showcase/showcase-webapp >>/dev/null; mvn clean install; popd >>/dev/null; fi; popd >>/dev/null; done
+
 	fi
 fi
 
