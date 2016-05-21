@@ -54,10 +54,22 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 	private File warFile;
 
 	/**
+	 * @parameter  default-value="${project.build.directory}/${project.build.finalName}.jar" expression="${jarFile}"
+	 * @required
+	 */
+	private File jarFile;
+
+	/**
 	 * @parameter  default-value="${project.build.finalName}.war" expression="${warFileName}"
 	 * @required
 	 */
 	private String warFileName;
+
+	/**
+	 * @parameter  default-value="${project.build.finalName}.jar" expression="${jarFileName}"
+	 * @required
+	 */
+	private String jarFileName;
 
 	public void execute() throws MojoExecutionException {
 
@@ -65,19 +77,35 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 			return;
 		}
 
-		if (warFile.exists()) {
+		if (jarFile != null && jarFile.exists()) {
+			System.err.println("HELLO: " + jarFileName);
+		} else {
+			System.err.println("NOPE: ");
+		}
 
-			String destinationFileName = warFileName;
-			destinationFileName = destinationFileName.replaceFirst("-SNAPSHOT", "");
-			destinationFileName = destinationFileName.replaceFirst("-(\\d+\\.)*(\\d+).war$", ".war");
-			destinationFileName = destinationFileName.replaceFirst("-(\\d+\\.)*(\\d+).jar$", ".jar");
-			getLog().info("FAST Deploying " + warFileName + " to " + autoDeployDir.getAbsolutePath() + "/" +
+		File sourceFile;
+		String sourceFileName;
+		String destinationFileName = warFileName;
+
+		if (warFile.exists()) {
+			sourceFile = warFile;
+			sourceFileName = warFileName;
+			destinationFileName = warFileName;
+		} else if(jarFile.exists()) {
+			sourceFile = jarFile;
+			sourceFileName = jarFileName;
+			destinationFileName = jarFileName;
+		} else {
+			getLog().warn("Neither " + warFileName + " nor " + jarFileName + " exist.");
+			return;
+		}
+
+		destinationFileName = destinationFileName.replaceFirst("-SNAPSHOT", "");
+		destinationFileName = destinationFileName.replaceFirst("-(\\d+\\.)*(\\d+).war$", ".war");
+		destinationFileName = destinationFileName.replaceFirst("-(\\d+\\.)*(\\d+).jar$", ".jar");
+		getLog().info("FAST Deploying " + sourceFileName + " to " + autoDeployDir.getAbsolutePath() + "/" +
 				destinationFileName);
-			CopyTask.copyFile(warFile, autoDeployDir, destinationFileName, null, true, true);
-		}
-		else {
-			getLog().warn(warFileName + " does not exist");
-		}
+		CopyTask.copyFile(sourceFile, autoDeployDir, destinationFileName, null, true, true);
 	}
 
 	@Override
