@@ -45,7 +45,14 @@ my $year= strftime "%Y", localtime;
 #
 # Parse the project version information from the parent-most POM file.
 #
-open POM, "pom.xml" or die "cannot open pom.xml: $!\n";
+
+my $pommy="pom.xml";
+if (defined $ARGV[0] and -f $ARGV[0]) {
+	$pommy=$ARGV[0];
+	print "pommy=$pommy\n";
+}
+
+open POM, $pommy or die "cannot open $pommy: $!\n";
 while(<POM>) {
 
 	if (/artifactId>com.liferay.faces..*.parent</) {
